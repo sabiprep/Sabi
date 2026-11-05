@@ -56,5 +56,5 @@ CREATE INDEX IF NOT EXISTS learning_events_session_idx
 ALTER TABLE public.learning_events ENABLE ROW LEVEL SECURITY;
 
 -- No browser/mobile role can read or write the event ledger directly.
-REVOKE ALL ON TABLE public.learning_events FROM anon, authenticated;
-GRANT ALL ON TABLE public.learning_events TO service_role;
+REVOKE ALL ON TABLE public.learning_events FROM anon, authenticated, service_role;
+GRANT SELECT, INSERT ON TABLE public.learning_events TO service_role;
