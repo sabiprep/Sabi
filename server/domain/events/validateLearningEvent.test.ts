@@ -34,8 +34,8 @@ test("rejects derived correctness and mastery fields", () => {
 });
 
 test("rejects unknown fields in an event payload", () => {
-  const event = validAnswerEvent();
-  event.payload["masteryScore" as keyof typeof event.payload] = 99 as never;
+  const event: Record<string, unknown> = validAnswerEvent();
+  event.payload = { optionId: "B", masteryScore: 99 };
   const result = validateLearningEventInput(event);
   assert.equal(result.success, false);
   if (!result.success) {
@@ -44,8 +44,7 @@ test("rejects unknown fields in an event payload", () => {
 });
 
 test("rejects system as a client event source", () => {
-  const event = validAnswerEvent();
-  event.source = "system" as "web";
+  const event = { ...validAnswerEvent(), source: "system" };
   const result = validateLearningEventInput(event);
   assert.equal(result.success, false);
   if (!result.success) {
@@ -82,5 +81,17 @@ test("rejects unknown event types and unsupported schema versions", () => {
   if (!result.success) {
     assert.ok(result.errors.some((error) => error.includes("eventType")));
     assert.ok(result.errors.some((error) => error.includes("schemaVersion")));
+  }
+});
+
+test("requires a session and question reference for question-scoped events", () => {
+  const event: Record<string, unknown> = validAnswerEvent();
+  delete event.sessionId;
+  delete event.questionId;
+  const result = validateLearningEventInput(event);
+  assert.equal(result.success, false);
+  if (!result.success) {
+    assert.ok(result.errors.some((error) => error.includes("sessionId is required")));
+    assert.ok(result.errors.some((error) => error.includes("questionId is required")));
   }
 });
