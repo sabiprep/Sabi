@@ -112,13 +112,13 @@ function validatePayload(
       break;
     case "explanation_opened":
       if (value.explanationType !== undefined &&
-          !["text", "video", "ai"].includes(String(value.explanationType))) {
+          !(["text", "video", "ai"] as readonly string[]).includes(String(value.explanationType))) {
         errors.push("payload.explanationType must be text, video, or ai.");
       }
       break;
     case "explanation_completed":
       if (value.completionMethod !== undefined &&
-          !["manual", "reader", "video"].includes(String(value.completionMethod))) {
+          !(["manual", "reader", "video"] as readonly string[]).includes(String(value.completionMethod))) {
         errors.push("payload.completionMethod must be manual, reader, or video.");
       }
       break;
@@ -153,7 +153,7 @@ function validatePayload(
       optionalString("reason", 500);
       break;
     case "session_completed":
-      if (!["completed", "student_submitted", "time_expired", "system_terminated"]
+      if (!(["completed", "student_submitted", "time_expired", "system_terminated"] as readonly string[])
         .includes(String(value.completionReason))) {
         errors.push("payload.completionReason is invalid.");
       }
