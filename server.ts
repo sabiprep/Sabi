@@ -11,6 +11,7 @@ import { GoogleGenAI, Type } from '@google/genai';
 import { createClient } from '@supabase/supabase-js';
 import { SEED_QUESTIONS, KNOWLEDGE_BASE, SYLLABUS_FREQUENCY } from './src/data/questions.ts';
 import { Question, SubjectName } from './src/types';
+import { createLearningEventsRouter } from './server/routes/learningEvents';
 
 const app = express();
 const PORT = 3000;
@@ -54,6 +55,16 @@ const hasServiceRoleKey = Boolean(
 const supabaseAdmin = createClient(supabaseUrl, supabaseServerKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
+
+// Versioned, authenticated learning-event ingestion. Writes are disabled unless
+// a server-only Supabase service credential is configured.
+app.use(
+  '/api/v1/learning/events',
+  createLearningEventsRouter({
+    supabase: supabaseAdmin,
+    persistenceEnabled: hasServiceRoleKey,
+  })
+);
 
 // Deterministic 5-character Unique SABI ID generator (4 digits + 1 uppercase letter, e.g. 4829K)
 function generateDeterministicSabiId(email: string): string {
