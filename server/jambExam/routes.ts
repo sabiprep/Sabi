@@ -127,7 +127,7 @@ jambExamRouter.get('/runs/:runId', requireAuth, async (req, res) => {
     return {
       ...publicQuestion(payload, item),
       questionNumber: item.question_number,
-      selectedAnswer: attemptMap.get(item.question_id) ?? null,
+      selectedAnswer: attemptMap.get(item.question_id)?.toUpperCase() ?? null,
       answered: attemptMap.has(item.question_id),
     };
   });
