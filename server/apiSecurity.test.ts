@@ -519,3 +519,22 @@ describe('student profile ownership', () => {
     }
   });
 });
+
+
+describe('Phase 2 question-bank API security', () => {
+  it('requires authentication for student delivery and content moderation routes', async () => {
+    await expect(request(app).get('/api/question-bank/eligible')).resolves.toMatchObject({ status: 401 });
+    await expect(request(app).post('/api/question-bank/eligible/BIO-001/answer').send({ answer: 'A' })).resolves.toMatchObject({ status: 401 });
+    await expect(request(app).get('/api/question-bank/review-queue')).resolves.toMatchObject({ status: 401 });
+    await expect(request(app).get('/api/question-bank/flag-queue')).resolves.toMatchObject({ status: 401 });
+    await expect(request(app).post('/api/question-bank/import/validate').send({ rows: [] })).resolves.toMatchObject({ status: 401 });
+    await expect(request(app).post('/api/question-bank/import/00000000-0000-4000-8000-000000000001/commit').send({})).resolves.toMatchObject({ status: 401 });
+    await expect(request(app).post('/api/question-bank/BIO-001/versions').send({})).resolves.toMatchObject({ status: 401 });
+    await expect(request(app).post('/api/question-bank/BIO-001/provenance/verify').send({})).resolves.toMatchObject({ status: 401 });
+    await expect(request(app).post('/api/question-bank/BIO-001/flag').send({ reason: 'wrong_answer' })).resolves.toMatchObject({ status: 401 });
+    await expect(request(app).post('/api/question-bank/flags/00000000-0000-4000-8000-000000000001/resolve').send({ status: 'resolved' })).resolves.toMatchObject({ status: 401 });
+    await expect(
+      request(app).post('/api/question-bank/BIO-001/review').send({ decision: 'approved' })
+    ).resolves.toMatchObject({ status: 401 });
+  });
+});
